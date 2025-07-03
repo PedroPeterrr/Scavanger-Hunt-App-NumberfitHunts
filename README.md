@@ -14,8 +14,6 @@ Axios – API calls and HTTP requests handling.
 
 Expo Camera – Enables camera scanning features.
 
-React Native Gesture Handler & Reanimated – Animation and gesture support.
-
 TypeScript – Used for strongly-typed JavaScript for enhanced maintainability.
 
  📐 Naming Conventions
