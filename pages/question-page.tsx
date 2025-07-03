@@ -1,8 +1,9 @@
 import React, { useState } from 'react';
+import * as Linking from 'expo-linking';
 import { RootStackParamList } from '../App';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { questionPageStyles } from '../styles/question-page.styles';
-import { submitAnswerAndNavigate } from '../api/quiz-api';
+import { submitQuizAnswer } from '../api/quiz-api';
 
 import { 
   View, 
@@ -23,8 +24,34 @@ export default function QuestionPage({ route, navigation }: Props) {
     if (!selected) return Alert.alert('Select an answer first.');
 
     setSubmitting(true);
-    await submitAnswerAndNavigate(questionData.endpoint || '/endpoint243252', selected, navigation);
-    setSubmitting(false);
+    try {
+      const endpoint = questionData.endpoint || '/endpoint243252';
+      const response = await submitQuizAnswer(endpoint, selected);
+
+      const { isCorrect, coordinates } = response.data;
+
+      Alert.alert(
+        'Answer submitted!',
+        `Coordinates: ${coordinates}`,
+        [
+          {
+            text: 'Open in Maps',
+            onPress: async () => {
+              const mapUrl = `https://www.google.com/maps/search/?api=1&query=${coordinates}`;
+              await Linking.openURL(mapUrl);
+              navigation.reset({
+                index: 0,
+                routes: [{ name: 'Home', params: { showScanAgain: true } }],
+              });
+            },
+          },
+        ]
+      );
+    } catch (error) {
+      Alert.alert('Error', 'Could not submit answer.');
+    } finally {
+      setSubmitting(false);
+    }
   };
 
   return (
